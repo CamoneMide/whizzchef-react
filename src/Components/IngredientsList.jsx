@@ -13,7 +13,9 @@ const IngredientsList = ({ ingredients, getRecipe, recipeSection }) => {
         <div className="get-recipe-container">
           <div ref={recipeSection}>
             <h3>Ready for a recipe?</h3>
-            <p>Generate a recipe from your list of ingredients.</p>
+            <p className="text-[12px] md:text-[15px]">
+              Generate a recipe from your list of ingredients.
+            </p>
           </div>
           <button onClick={getRecipe}>Get a recipe</button>
         </div>

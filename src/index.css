@@ -62,6 +62,10 @@ header {
   font-family: "Pacifico", serif;
 }
 
+.flex1 {
+  flex: 1;
+}
+
 header > .hDiv1 {
   display: flex;
   justify-content: center;
@@ -135,7 +139,7 @@ ul.ingredients-list > li {
   align-items: center;
   border-radius: 8px;
   background: var(--area-bg-color);
-  padding: 10px 28px;
+  padding: 10px 16px;
   transition: all ease-in-out 0.4s;
 }
 
@@ -147,7 +151,7 @@ ul.ingredients-list > li {
 
 .get-recipe-container p {
   color: var(--text-paragraph2);
-  font-size: 0.875rem;
+  /* font-size: 0.75rem; */
   line-height: 20px;
 }
 

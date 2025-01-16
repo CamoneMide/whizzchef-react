@@ -51,6 +51,9 @@ const Main = () => {
 
   return (
     <main>
+      <h2 className="font-[700] text-[22px] text-center pb-[14px]">
+        Create Recipe😊
+      </h2>
       <form onSubmit={addIngredient} className="add-ingredient-form">
         <input
           type="text"
@@ -68,11 +71,10 @@ const Main = () => {
           recipeSection={recipeSection}
         />
       )}
-
       {recipe && <ClaudeRecipe recipe={recipe} />}
 
       <div
-        className={`"h-dvh w-dvw bg-[rgba(0,0,0,0.6)] backdrop-blur-[20px] absolute moonTrans inset-0 px-[4%] py-[2%]  ${
+        className={`z-10 h-dvh w-dvw bg-[rgba(0,0,0,0.6)] backdrop-blur-[20px] absolute moonTrans inset-0 px-[4%] py-[2%]  ${
           welcome ? "opacity-[1]" : "-translate-x-[100%] opacity-0"
         }`}
       >
@@ -111,15 +113,15 @@ const Main = () => {
             </li>
             <li>
               <span className="font-[600]">
-                <i className="bx bxs-bookmark-alt-minus text-[18px]"></i> Add
-                Get Creative:
+                <i className="bx bxs-bookmark-alt-minus text-[18px]"></i> Get
+                Creative:
               </span>{" "}
               Click the "Get Recipe" button to let our AI chef work its magic.
             </li>
             <li>
               <span className="font-[600]">
-                <i className="bx bxs-bookmark-alt-minus text-[18px]"></i> Add
-                Enjoy Cooking:
+                <i className="bx bxs-bookmark-alt-minus text-[18px]"></i> Enjoy
+                Cooking:
               </span>{" "}
               Receive a unique recipe tailored to your ingredients.
             </li>

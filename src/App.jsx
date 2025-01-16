@@ -1,6 +1,5 @@
 import React from "react";
-import Header from "./Components/Header";
-import Main from "./Components/Main";
+import { Footer, Header, Main } from "./Components";
 
 function App() {
   // State to manage the theme
@@ -28,8 +27,15 @@ function App() {
 
   return (
     <>
-      <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-      <Main />
+      <div className="flex flex-col justify-between min-h-dvh">
+        <div>
+          <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+          <Main />
+        </div>
+        <div>
+          <Footer />
+        </div>
+      </div>
     </>
   );
 }
