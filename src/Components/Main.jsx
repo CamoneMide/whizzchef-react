@@ -89,7 +89,7 @@ const Main = () => {
             </h1>
           </div>
           <div
-            className="px-[4px] py-[3px] text-[30px] bg-[#3a3a36] text-[#FFF] flex rounded-[6px] cursor-pointer"
+            className="px-[4px] py-[3px] text-[30px] bg-[#111] text-[#FFF] flex rounded-[6px] cursor-pointer"
             onClick={handleWelcome}
           >
             <i className="bx bx-x"></i>
@@ -131,9 +131,13 @@ const Main = () => {
             inner chef today!
           </p>
         </div>
-        <div className="mt-[10px]">
+
+        <div className="mt-[16px]">
+          <div className="text-[#FFF] text-[24px] animate-bounce ml-[50px]">
+            <i className="-rotate-90 bx bx-arrow-back "></i>
+          </div>
           <button
-            className="bg-[#3a3a36] text-[#FFF] py-[4px] px-[12px] rounded-[8px] font-[600] cursor-pointer"
+            className="bg-[#111] text-[#FFF] py-[4px] px-[12px] rounded-[8px] font-[600] cursor-pointer"
             onClick={handleWelcome}
           >
             Get Started
