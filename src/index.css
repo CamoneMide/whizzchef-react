@@ -171,7 +171,7 @@ ul.ingredients-list > li {
   color: var(--text-paragraph1);
   line-height: 28px;
   font-size: 1.125rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .suggested-recipe-container ul li,
