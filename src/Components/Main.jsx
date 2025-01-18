@@ -6,14 +6,16 @@ import chefClaudeLogo from "../assets/images/ai-chef-logo.webp";
 
 const Main = () => {
   const [ingredients, setIngredients] = React.useState([
-    // "Rice",
+    // "All the main spices",
+    // "Yam",
     // "Chicken",
-    // "Beans",
+    // "Eggs",
     // "Plantain",
     // "Vegetable Salad",
-    // "All the main spices",
+    // "Oil",
   ]);
   const [recipe, setRecipe] = React.useState("");
+  const [loadRecipe, setLoadRecipe] = React.useState(false);
   const [welcome, setWelcome] = React.useState(true);
   const recipeSection = React.useRef(null);
 
@@ -36,10 +38,16 @@ const Main = () => {
   }
 
   async function getRecipe() {
+    setLoadRecipe(true);
     // setRecipeShown((prevShown) => !prevShown);
     const recipeMarkdown = await getRecipeFromMistral(ingredients);
     setRecipe(recipeMarkdown);
   }
+  React.useEffect(() => {
+    if (recipe) {
+      setLoadRecipe(false);
+    }
+  }, [loadRecipe, recipe]);
 
   function addIngredient(e) {
     e.preventDefault();
@@ -69,6 +77,7 @@ const Main = () => {
           ingredients={ingredients}
           getRecipe={getRecipe}
           recipeSection={recipeSection}
+          loadRecipe={loadRecipe}
         />
       )}
       {recipe && <ClaudeRecipe recipe={recipe} />}
