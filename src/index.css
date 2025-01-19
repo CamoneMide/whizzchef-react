@@ -128,10 +128,12 @@ ul.ingredients-list {
   margin-bottom: 48px;
 }
 
-ul.ingredients-list > li {
+ul.ingredients-list > div {
   color: var(--text-paragraph1);
-  line-height: 28px;
 }
+/* ul.ingredients-list > div > li {
+  line-height: 28px;
+} */
 
 .get-recipe-container {
   display: flex;

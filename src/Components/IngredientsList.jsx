@@ -1,17 +1,36 @@
 const IngredientsList = ({
   ingredients,
+  deleteIngredient,
   getRecipe,
   recipeSection,
   loadRecipe,
 }) => {
-  const ingredientsListItems = ingredients.map((ingredient) => (
-    <li key={ingredient}>{ingredient}</li>
+  const ingredientsListItems = ingredients.map((ingredient, index) => (
+    <div
+      className="flex items-center w-full lg:w-[50%] px-2 bg-[var(--area-bg-color)]"
+      key={`${ingredient}-${index}`}
+    >
+      <li className="flex1">{ingredient}</li>
+      <div
+        onClick={() => {
+          deleteIngredient(index);
+        }}
+        className="hover:text-[var(--button-bg-secondary)] text-[20px] cursor-pointer"
+      >
+        <i className="bx bx-trash"></i>
+      </div>
+    </div>
   ));
 
   return (
     <section>
-      <h2 className="text-[20px] font-[600] mt-10">Ingredients on hand:</h2>
-      <ul className="ingredients-list" aria-live="polite">
+      <h2 className="text-[20px] font-[600] mt-10 mb-2">
+        Ingredients on hand:
+      </h2>
+      <ul
+        className="flex flex-col space-y-1 ingredients-list"
+        aria-live="polite"
+      >
         {ingredientsListItems}
       </ul>
       {ingredients.length > 3 && (

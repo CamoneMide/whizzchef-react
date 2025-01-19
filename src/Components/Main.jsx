@@ -46,16 +46,43 @@ const Main = () => {
   React.useEffect(() => {
     if (recipe) {
       setLoadRecipe(false);
+      setIngredients([]);
     }
   }, [loadRecipe, recipe]);
+
+  function persistData(newIngList) {
+    localStorage.setItem(
+      "ingredients",
+      JSON.stringify({ ingredients: newIngList })
+    );
+  }
 
   function addIngredient(e) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const newIngredient = formData.get("ingredient");
+    persistData([...ingredients, newIngredient]);
     setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
     e.currentTarget.reset();
   }
+  function deleteIngredient(index) {
+    const newIngredient = ingredients.filter((ingredient, ingredientIndex) => {
+      return ingredientIndex !== index;
+    });
+    persistData(newIngredient);
+    setIngredients(newIngredient);
+  }
+  React.useEffect(() => {
+    if (!localStorage) {
+      return;
+    }
+    let localIngredients = localStorage.getItem("ingredients");
+    if (!localIngredients) {
+      return;
+    }
+    localIngredients = JSON.parse(localIngredients).ingredients;
+    setIngredients(localIngredients);
+  }, []);
 
   return (
     <main>
@@ -75,6 +102,7 @@ const Main = () => {
       {ingredients.length > 0 && (
         <IngredientsList
           ingredients={ingredients}
+          deleteIngredient={deleteIngredient}
           getRecipe={getRecipe}
           recipeSection={recipeSection}
           loadRecipe={loadRecipe}
