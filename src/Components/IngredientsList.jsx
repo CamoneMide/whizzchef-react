@@ -15,7 +15,7 @@ const IngredientsList = ({
         onClick={() => {
           deleteIngredient(index);
         }}
-        className="hover:text-[var(--button-bg-secondary)] text-[20px] cursor-pointer"
+        className="hover:text-[#D11A2A] text-[20px] cursor-pointer"
       >
         <i className="bx bx-trash"></i>
       </div>

@@ -43,12 +43,6 @@ const Main = () => {
     const recipeMarkdown = await getRecipeFromMistral(ingredients);
     setRecipe(recipeMarkdown);
   }
-  React.useEffect(() => {
-    if (recipe) {
-      setLoadRecipe(false);
-      setIngredients([]);
-    }
-  }, [loadRecipe, recipe]);
 
   function persistData(newIngList) {
     localStorage.setItem(
@@ -56,6 +50,14 @@ const Main = () => {
       JSON.stringify({ ingredients: newIngList })
     );
   }
+
+  React.useEffect(() => {
+    if (recipe) {
+      setLoadRecipe(false);
+      // persistData([]);
+      setIngredients([]);
+    }
+  }, [loadRecipe, recipe]);
 
   function addIngredient(e) {
     e.preventDefault();
@@ -86,6 +88,11 @@ const Main = () => {
 
   return (
     <main>
+      <div>
+        <h2 className="font-[700] text-[22px] text-center pb-[14px]">
+          Recipe List
+        </h2>
+      </div>
       <h2 className="font-[700] text-[22px] text-center pb-[14px]">
         Create Recipe😊
       </h2>
