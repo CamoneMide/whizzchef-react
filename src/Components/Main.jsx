@@ -3,22 +3,24 @@ import ClaudeRecipe from "./ClaudeRecipe.jsx";
 import IngredientsList from "./IngredientsList.jsx";
 import { getRecipeFromMistral } from "../../ai.js";
 import chefClaudeLogo from "../assets/images/ai-chef-logo.webp";
+import { useNavigate } from "react-router-dom";
 
 const Main = () => {
-  const [ingredients, setIngredients] = React.useState([
-    // "All the main spices",
-    // "Yam",
-    // "Chicken",
-    // "Eggs",
-    // "Plantain",
-    // "Vegetable Salad",
-    // "Oil",
-  ]);
+  const [ingredients, setIngredients] = React.useState([]);
   const [recipe, setRecipe] = React.useState("");
+  const [savedRecipes, setSavedRecipes] = React.useState([]);
+
   const [loadRecipe, setLoadRecipe] = React.useState(false);
   const [welcome, setWelcome] = React.useState(true);
+
+  const navigate = useNavigate();
   const recipeSection = React.useRef(null);
 
+  React.useEffect(() => {
+    if (savedRecipes.length > 0) {
+      setWelcome(false);
+    }
+  }, [savedRecipes]);
   React.useEffect(() => {
     if (!(recipe === "") && !(recipeSection.current === null)) {
       //  One Way to ScrollIntoView
@@ -37,12 +39,92 @@ const Main = () => {
     setWelcome((prev) => !prev);
   }
 
+  // Load savedRecipes from localStorage on component mount(Render)
+  React.useEffect(() => {
+    const storedRecipes = localStorage.getItem("savedRecipes");
+    if (storedRecipes) {
+      setSavedRecipes(JSON.parse(storedRecipes));
+    }
+  }, []);
+
+  // const extractTitle = (markdown) => {
+  //   const titleMatch = markdown.match(
+  //     /^#\s*(?:Recipe:\s*)?\*\*(.+?)\*\*|^#\s*(?:Recipe:\s*)?([^\n#*[]+)/im
+  //   );
+
+  //   if (!titleMatch) return "Untitled Recipe";
+
+  //   const title = (titleMatch[1] || titleMatch[2]).trim();
+
+  //   return title
+  //     .replace(/^\*\*|\*\*$/g, "") // Remove bold markers if present
+  //     .replace(/\[|\]/g, "") // Remove square brackets
+  //     .trim();
+  // };
+
+  const extractTitle = (markdown) => {
+    const headingMatch = markdown.match(
+      /^#\s*(?:Recipe:\s*)?\*\*(.+?)\*\*|^#\s*(.+)/
+    );
+    if (headingMatch) return (headingMatch[1] || headingMatch[2]).trim();
+
+    const boldMatch = markdown.match(/^\*\*(.+?)\*\*\s*\n/);
+    if (boldMatch) return boldMatch[1].trim();
+
+    const firstLine = markdown.split("\n")[0].trim();
+    if (firstLine) return firstLine.replace(/^[#*_]+/, "").trim();
+
+    return "Untitled Recipe";
+  };
+
   async function getRecipe() {
     setLoadRecipe(true);
     // setRecipeShown((prevShown) => !prevShown);
-    const recipeMarkdown = await getRecipeFromMistral(ingredients);
-    setRecipe(recipeMarkdown);
+    try {
+      const recipeMarkdown = await getRecipeFromMistral(ingredients);
+      setRecipe(recipeMarkdown);
+      const title = extractTitle(recipeMarkdown);
+
+      // Automatically save to localStorage
+      saveToLocalStorage(recipeMarkdown, title);
+
+      return { data: recipeMarkdown, title };
+    } catch (error) {
+      console.error("Error fetching recipe:", error);
+      return null;
+    }
   }
+
+  // Save recipe to localStorage
+  const saveToLocalStorage = (markdown, title) => {
+    if (!markdown) return;
+
+    const newRecipe = {
+      id: Date.now(),
+      title: title || extractTitle(markdown),
+      fullData: markdown,
+      dateSaved: new Date().toISOString(),
+    };
+
+    const existingRecipes =
+      JSON.parse(localStorage.getItem("savedRecipes")) || [];
+    const updatedRecipes = [...existingRecipes, newRecipe];
+
+    setSavedRecipes(updatedRecipes);
+    localStorage.setItem("savedRecipes", JSON.stringify(updatedRecipes));
+  };
+
+  // Delete recipe from localStorage
+  const deleteRecipe = (id) => {
+    const updatedRecipes = savedRecipes.filter((recipe) => recipe.id !== id);
+    setSavedRecipes(updatedRecipes);
+    localStorage.setItem("savedRecipes", JSON.stringify(updatedRecipes));
+  };
+
+  // View full recipe
+  const viewFullRecipe = (id) => {
+    navigate(`/recipe/${id}`);
+  };
 
   function persistData(newIngList) {
     localStorage.setItem(
@@ -54,7 +136,7 @@ const Main = () => {
   React.useEffect(() => {
     if (recipe) {
       setLoadRecipe(false);
-      // persistData([]);
+      persistData([]);
       setIngredients([]);
     }
   }, [loadRecipe, recipe]);
@@ -88,13 +170,53 @@ const Main = () => {
 
   return (
     <main>
-      <div>
-        <h2 className="font-[700] text-[22px] text-center pb-[14px]">
-          Recipe List
-        </h2>
+      <div className="flex flex-col mb-[30px]">
+        <h2 className="font-[600] text-[22px] pb-[14px]">My Recipe List😊</h2>
+        {savedRecipes.length > 0 ? (
+          <ul className="flex flex-col gap-[8px] w-full max-w-[520px]">
+            {savedRecipes.map((savedRecipe) => (
+              <li
+                key={savedRecipe.id}
+                className="flex items-start justify-between p-2 border-[1px] border-[#d1d5db] rounded-[8px] hover:bg-[var(--area-bg-color)] moonTrans"
+              >
+                <div
+                  className="cursor-pointer flex1 flex flex-col gap-[2px]"
+                  onClick={() => viewFullRecipe(savedRecipe.id)}
+                >
+                  <h3 className="font-[500] hover:text-[var(--button-bg-secondary)] cursor-pointer">
+                    {savedRecipe.title}
+                  </h3>
+                  <p className="text-[12px] md:text-[15px] text-[var(--text-paragraph1)]">
+                    {new Date(savedRecipe.dateSaved).toLocaleString()}
+                  </p>
+                </div>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteRecipe(savedRecipe.id);
+                  }}
+                  className="hover:text-[#D11A2A] text-[20px] cursor-pointer text-[var(--text-paragraph1)]"
+                >
+                  <i className="bx bx-trash"></i>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <>
+            <h4 className="italic font-[400] text-[var(--text-paragraph2)]">
+              You have not created any Recipe yet...
+            </h4>
+            <h4 className="italic font-[500] text-[var(--text-paragraph2)]">
+              Create a new Recipe below...👇👇
+            </h4>
+          </>
+        )}
       </div>
-      <h2 className="font-[700] text-[22px] text-center pb-[14px]">
-        Create Recipe😊
+      <h2 className="font-[700] text-[22px] text-center">
+        {savedRecipes.length > 0
+          ? "Create New Recipe🍵😊"
+          : "Create Recipe🍵😊"}
       </h2>
       <form onSubmit={addIngredient} className="add-ingredient-form">
         <input
@@ -118,7 +240,7 @@ const Main = () => {
       {recipe && <ClaudeRecipe recipe={recipe} />}
 
       <div
-        className={`z-10 h-dvh w-dvw bg-[rgba(0,0,0,0.6)] backdrop-blur-[20px] absolute moonTrans inset-0 px-[4%] py-[2%]  ${
+        className={`z-20 h-dvh w-dvw bg-[rgba(0,0,0,0.6)] backdrop-blur-[20px] fixed moonTrans inset-0 px-[4%] py-[2%]  ${
           welcome ? "opacity-[1]" : "-translate-x-[100%] opacity-0"
         }`}
       >

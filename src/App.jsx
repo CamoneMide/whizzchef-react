@@ -1,11 +1,11 @@
 import React from "react";
-import { Footer, Header, Main } from "./Components";
+import { Footer, Header, Main, RecipeDetail } from "./Components";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-  // State to manage the theme
   const [isDarkMode, setIsDarkMode] = React.useState(false);
 
-  // Load theme from localStorage or default to light mode
+  // Load theme from localStorage
   React.useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -27,15 +27,23 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col justify-between min-h-dvh">
-        <div>
-          <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-          <Main />
-        </div>
-        <div>
-          <Footer />
-        </div>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div className="flex flex-col justify-between min-h-dvh">
+              <div>
+                <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+                <Main />
+              </div>
+              <div>
+                <Footer />
+              </div>
+            </div>
+          }
+        />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
+      </Routes>
     </>
   );
 }
