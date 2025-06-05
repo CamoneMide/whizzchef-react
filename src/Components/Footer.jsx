@@ -1,3 +1,5 @@
+import { BsGithub } from "react-icons/bs";
+
 const Footer = () => {
   return (
     <>
@@ -20,6 +22,14 @@ const Footer = () => {
               className="text-[20px] text-[#0A66C2] px-[2px]"
             >
               <i className="bx bxl-linkedin"></i>
+            </a>
+            <a
+              rel="noreferrer"
+              href="https://github.com/CamoneMide"
+              target="_blank"
+              className="text-[#0A66C2]"
+            >
+              <BsGithub size={18} />
             </a>
           </p>
         </div>

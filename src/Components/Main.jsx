@@ -1,9 +1,10 @@
 import React from "react";
 import ClaudeRecipe from "./ClaudeRecipe.jsx";
 import IngredientsList from "./IngredientsList.jsx";
-import { getRecipeFromMistral } from "../../ai.js";
 import chefClaudeLogo from "../assets/images/ai-chef-logo.webp";
 import { useNavigate } from "react-router-dom";
+import { getRecipeFromGemini } from "../../gen-ai.js";
+// import { getRecipeFromSpace } from "../../hf_space-ai.js";
 
 const Main = () => {
   const [ingredients, setIngredients] = React.useState([]);
@@ -47,32 +48,28 @@ const Main = () => {
     }
   }, []);
 
-  // const extractTitle = (markdown) => {
-  //   const titleMatch = markdown.match(
-  //     /^#\s*(?:Recipe:\s*)?\*\*(.+?)\*\*|^#\s*(?:Recipe:\s*)?([^\n#*[]+)/im
-  //   );
-
-  //   if (!titleMatch) return "Untitled Recipe";
-
-  //   const title = (titleMatch[1] || titleMatch[2]).trim();
-
-  //   return title
-  //     .replace(/^\*\*|\*\*$/g, "") // Remove bold markers if present
-  //     .replace(/\[|\]/g, "") // Remove square brackets
-  //     .trim();
-  // };
-
   const extractTitle = (markdown) => {
-    const headingMatch = markdown.match(
-      /^#\s*(?:Recipe:\s*)?\*\*(.+?)\*\*|^#\s*(.+)/
-    );
-    if (headingMatch) return (headingMatch[1] || headingMatch[2]).trim();
+    // First try to match the ## heading format (most reliable)
+    const headingMatch = markdown.match(/^##\s+(.+?)\s*$/m);
+    if (headingMatch) return headingMatch[1].trim();
 
-    const boldMatch = markdown.match(/^\*\*(.+?)\*\*\s*\n/);
-    if (boldMatch) return boldMatch[1].trim();
+    // Fallback: Look for text between **double asterisks** in the first few lines
+    const firstLines = markdown.split("\n").slice(0, 5).join("\n");
+    const boldMatch = firstLines.match(/\*\*(.+?)\*\*/);
+    if (boldMatch) {
+      // Remove any prefix like "here's a recipe for"
+      const title = boldMatch[1].replace(/^[a-z ,']+/, "").trim();
+      if (title) return title;
+    }
 
-    const firstLine = markdown.split("\n")[0].trim();
-    if (firstLine) return firstLine.replace(/^[#*_]+/, "").trim();
+    // Final fallback: First non-empty line, cleaned up
+    const firstLine = markdown.split("\n").find((line) => line.trim());
+    if (firstLine) {
+      return firstLine
+        .replace(/^[#*_]+/, "")
+        .replace(/^[a-z ,']+/, "")
+        .trim();
+    }
 
     return "Untitled Recipe";
   };
@@ -81,8 +78,10 @@ const Main = () => {
     setLoadRecipe(true);
     // setRecipeShown((prevShown) => !prevShown);
     try {
-      const recipeMarkdown = await getRecipeFromMistral(ingredients);
+      const recipeMarkdown = await getRecipeFromGemini(ingredients);
+
       setRecipe(recipeMarkdown);
+
       const title = extractTitle(recipeMarkdown);
 
       // Automatically save to localStorage
@@ -144,10 +143,15 @@ const Main = () => {
   function addIngredient(e) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const newIngredient = formData.get("ingredient");
-    persistData([...ingredients, newIngredient]);
-    setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
-    e.currentTarget.reset();
+    const newIngredient = formData.get("ingredient").trim(); // Trim whitespace
+    // Only proceed if ingredient is not empty
+    if (newIngredient) {
+      persistData([...ingredients, newIngredient]);
+      setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+      e.currentTarget.reset();
+    } else {
+      alert("Empty ingredient not allowed");
+    }
   }
   function deleteIngredient(index) {
     const newIngredient = ingredients.filter((ingredient, ingredientIndex) => {
